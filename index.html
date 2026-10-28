@@ -99,12 +99,12 @@ function place(){const hit=targetBlock();if(!hit){toast('瞄準一個方塊旁�
 function eat(){if(inventory.berry>0){inventory.berry--;player.food=Math.min(100,player.food+28);drawHotbar();toast('吃了莓果，飢餓值恢復')}else toast('沒有莓果，去探索尋找吧')}
 document.querySelector('#mine').onclick=mine;document.querySelector('#place').onclick=place;document.querySelector('#eat').onclick=eat;
 let keys={};addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.code==='Space'){e.preventDefault();jump()}if(e.key.toLowerCase()==='e')mine()});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
-function jump(){if(player.ground){player.vy=7.4;player.ground=false}}
+function jump(){if(started&&player.ground){player.vy=7.4;player.ground=false}}
 document.querySelector('#jump').onclick=jump;
 const joy=document.querySelector('#joystick'),stick=document.querySelector('#stick');let joyId=null,joyX=0,joyY=0;
 function joyMove(e){const r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let dx=e.clientX-cx,dy=e.clientY-cy;const d=Math.hypot(dx,dy),max=34;if(d>max){dx*=max/d;dy*=max/d}joyX=dx/max;joyY=dy/max;stick.style.transform=`translate(${dx}px,${dy}px)`}
-joy.addEventListener('pointerdown',e=>{e.preventDefault();joyId=e.pointerId;joy.setPointerCapture(e.pointerId);joyMove(e)});joy.addEventListener('pointermove',e=>{if(e.pointerId===joyId)joyMove(e)});function joyEnd(e){if(e.pointerId===joyId){joyId=null;joyX=joyY=0;stick.style.transform='translate(0,0)'}}joy.addEventListener('pointerup',joyEnd);joy.addEventListener('pointercancel',joyEnd);
-let lookId=null,lastX=0,lastY=0;renderer.domElement.addEventListener('pointerdown',e=>{if(!started||e.clientX<innerWidth*.38||e.target.closest('button'))return;lookId=e.pointerId;lastX=e.clientX;lastY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerId!==lookId)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;player.yaw-=dx*.004;player.pitch=Math.max(-1.15,Math.min(1.05,player.pitch-dy*.004))});function lookEnd(e){if(e.pointerId===lookId)lookId=null}renderer.domElement.addEventListener('pointerup',lookEnd);renderer.domElement.addEventListener('pointercancel',lookEnd);
+joy.addEventListener('pointerdown',e=>{e.preventDefault();joyId=e.pointerId;joy.setPointerCapture(e.pointerId);joyMove(e)});joy.addEventListener('pointermove',e=>{if(e.pointerId===joyId)joyMove(e)});function joyEnd(e){if(e.pointerId===joyId){joyId=null;joyX=joyY=0;stick.style.transform='translate(0,0)'}}joy.addEventListener('pointerup',joyEnd);joy.addEventListener('pointercancel',joyEnd);joy.addEventListener('lostpointercapture',joyEnd);
+let lookId=null,lastX=0,lastY=0;renderer.domElement.addEventListener('pointerdown',e=>{if(!started||e.clientX<innerWidth*.38||e.target.closest('button'))return;lookId=e.pointerId;lastX=e.clientX;lastY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});renderer.domElement.addEventListener('pointermove',e=>{if(e.pointerId!==lookId)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;player.yaw-=dx*.004;player.pitch=Math.max(-1.15,Math.min(1.05,player.pitch-dy*.004))});function lookEnd(e){if(e.pointerId===lookId)lookId=null}renderer.domElement.addEventListener('pointerup',lookEnd);renderer.domElement.addEventListener('pointercancel',lookEnd);renderer.domElement.addEventListener('lostpointercapture',lookEnd);
 renderer.domElement.addEventListener('click',()=>{if(started&&matchMedia('(pointer:fine)').matches)mine()});
 document.querySelector('#startbtn').addEventListener('click',()=>{started=true;document.querySelector('#start').style.display='none';toast('歡迎來到荒野！試著採集附近的樹木和石頭。')});
 function solidAt(x,y,z){const bx=Math.round(x),by=Math.round(y),bz=Math.round(z);return blocks.has(key(bx,by,bz))}
@@ -114,8 +114,8 @@ function animate(now){requestAnimationFrame(animate);const dt=Math.min(.04,(now-
   const forward=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0)-joyY;
   const side=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+joyX;
   const len=Math.hypot(forward,side)||1;const speed=4.1;
-  const dx=(Math.sin(player.yaw)*forward+Math.cos(player.yaw)*side)/len*speed*dt;
-  const dz=(-Math.cos(player.yaw)*forward+Math.sin(player.yaw)*side)/len*speed*dt;
+  const dx=(-Math.sin(player.yaw)*forward+Math.cos(player.yaw)*side)/len*speed*dt;
+  const dz=(-Math.cos(player.yaw)*forward-Math.sin(player.yaw)*side)/len*speed*dt;
   if(!solidAt(player.x+dx,player.y-.8,player.z))player.x+=dx;
   if(!solidAt(player.x,player.y-.8,player.z+dz))player.z+=dz;
   player.vy-=18*dt;let ny=player.y+player.vy*dt;
