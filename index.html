@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Narebek — Biome Wildlands v6 · HD Large World</title>
+<title>Narebek — Deep Wildlands v7 · 64px HD</title>
 <style>
 :root{--bg:#08151a;--panel:rgba(8,20,25,.82);--line:#45636a;--mint:#a5f3c5;--text:#effaf5}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -38,7 +38,7 @@ button:active{background:#245448}
 <body>
 <div id="game"></div>
 <div id="top">
- <div class="brand"><b>NAREBEK</b><small>WILDLANDS · BIOMES v6 HD</small></div>
+ <div class="brand"><b>NAREBEK</b><small>WILDLANDS · DEEP WORLD v7 HD</small></div>
  <div class="status">❤ 生命 <span id="hptext">100</span><div class="meter"><i id="hpbar"></i></div>🍎 飢餓 <span id="foodtext">100</span><div class="meter"><i id="foodbar"></i></div><span id="clock">白天</span></div>
 </div>
 <div id="hint">左側移動 · 右側拖曳轉視角 · 點方塊採集</div>
@@ -53,14 +53,14 @@ button:active{background:#245448}
 <div id="hotbar"></div>
 <div id="craftpanel" style="display:none;position:fixed;z-index:6;top:50%;left:50%;transform:translate(-50%,-50%);width:min(340px,90vw);padding:18px;background:#10272cf5;border:1px solid #a5f3c5;border-radius:18px">
 <h3 style="margin:0 0 8px">🛠 工作台 · 合成</h3>
-<p style="font-size:12px">木材 ×2 + 石頭 ×2 → 能量發射器</p>
-<button id="makeblaster">合成能量發射器</button>
+<p style="font-size:12px">木材 ×2 + 鐵礦 ×3 + 銅礦 ×2 → 荒野脈衝步槍</p>
+<button id="makeblaster">合成荒野脈衝步槍</button>
 <p style="font-size:12px">木材 ×1 + 莓果 ×1 → 急救包（恢復生命）</p>
 <button id="makeheal">合成急救包</button>
 <button id="closecraft" style="display:block;margin-top:12px;width:100%">關閉</button></div>
 <div id="start"><div class="card">
-<h1>NAREBEK</h1><div style="color:#a5f3c5;font-size:12px;letter-spacing:2px">WILDLANDS · BIOMES v6 HD</div>
-<p>探索持續延伸的原創荒野：森林、沙漠、雪山、草原和濕地。收集木材、石頭和莓果，搭建自己的小世界。新版加入合成、能量發射器與荒野怪物，還有更柔和的光影。</p>
+<h1>NAREBEK</h1><div style="color:#a5f3c5;font-size:12px;letter-spacing:2px">WILDLANDS · DEEP WORLD v7 HD</div>
+<p>探索持續延伸的原創荒野：森林、沙漠、雪山、草原、濕地與深層礦洞。收集木材、石頭和莓果，搭建自己的小世界。新版加入 64×64 像素材質、礦石、合成式虛構脈衝步槍與荒野怪物。</p>
 <p><b>操作</b><br>iPad：左下搖桿移動，拖曳右側畫面轉視角；按「採集」取得面前方塊，按「放置」放置選中的方塊。電腦：WASD 移動、滑鼠轉視角、空白鍵跳躍、左鍵採集。</p>
 <button id="startbtn" type="button">進入荒野</button>
 </div></div>
@@ -71,7 +71,7 @@ const root=document.querySelector('#game');
 const scene=new THREE.Scene(); scene.background=new THREE.Color(0x91cbe8); scene.fog=new THREE.Fog(0x91cbe8,38,90);
 const camera=new THREE.PerspectiveCamera(72,innerWidth/innerHeight,.1,220);
 const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.65)); renderer.setSize(innerWidth,innerHeight); renderer.shadowMap.enabled=false; renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15; root.appendChild(renderer.domElement);
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.9)); renderer.setSize(innerWidth,innerHeight); renderer.shadowMap.enabled=false; renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15; root.appendChild(renderer.domElement);
 scene.add(new THREE.HemisphereLight(0xe4f6ff,0x4e6650,2.25));
 const sun=new THREE.DirectionalLight(0xfff0c7,2.1);sun.position.set(-12,24,9);scene.add(sun); sun.position.set(-12,24,9);
 const mat={grass:new THREE.MeshLambertMaterial({color:0x69a84c}),dirt:new THREE.MeshLambertMaterial({color:0x80533a}),stone:new THREE.MeshLambertMaterial({color:0x89979a}),wood:new THREE.MeshLambertMaterial({color:0x9a693e}),leaf:new THREE.MeshLambertMaterial({color:0x367d50}),sand:new THREE.MeshLambertMaterial({color:0xcab77c}),berry:new THREE.MeshLambertMaterial({color:0xb94768}),water:new THREE.MeshLambertMaterial({color:0x4aafcf,transparent:true,opacity:.78}),darkwood:new THREE.MeshLambertMaterial({color:0x67452f})};
@@ -80,6 +80,24 @@ mat.ice=new THREE.MeshLambertMaterial({color:0xa9dfeb});
 mat.drygrass=new THREE.MeshLambertMaterial({color:0xc3b16d});
 mat.swamp=new THREE.MeshLambertMaterial({color:0x567d48});
 mat.pine=new THREE.MeshLambertMaterial({color:0x235a46});
+// Procedural 64x64 texture pixels on each block face (not 4096 meshes).
+function texture64(base,seed){
+ const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');
+ g.fillStyle=base;g.fillRect(0,0,64,64);
+ let n=seed>>>0;
+ for(let i=0;i<1100;i++){
+  n=(Math.imul(n,1664525)+1013904223)>>>0;const x=n%64;
+  n=(Math.imul(n,1664525)+1013904223)>>>0;const y=n%64;
+  g.fillStyle=(i%3===0?'#ffffff':'#000000');g.globalAlpha=i%3===0?.09:.07;
+  g.fillRect(x,y,1+(i%3===0?1:0),1);
+ }
+ g.globalAlpha=1;const t=new THREE.CanvasTexture(c);t.magFilter=THREE.NearestFilter;t.minFilter=THREE.LinearMipmapLinearFilter;t.colorSpace=THREE.SRGBColorSpace;return t;
+}
+const colors={grass:'#70ad50',dirt:'#896143',stone:'#8c999c',wood:'#94663f',leaf:'#418657',sand:'#d2bd80',berry:'#bf4c68',water:'#4bafce',darkwood:'#69462e',snow:'#e5f1f6',ice:'#a7dce9',drygrass:'#bdac6c',swamp:'#5b7d4b',pine:'#2b624d',coal:'#444b50',iron:'#b68163',copper:'#b8794c',gold:'#e4c35e',gem:'#56c4ba',clay:'#a78c82',crystal:'#8d83e1'};
+for(const [name,base] of Object.entries(colors)){
+ if(!mat[name])mat[name]=new THREE.MeshLambertMaterial({color:0xffffff});
+ mat[name].color.set(0xffffff);mat[name].map=texture64(base,name.split('').reduce((a,c)=>a+c.charCodeAt(0),0));mat[name].needsUpdate=true;
+}
 const geo=new THREE.BoxGeometry(1,1,1);const blocks=new Map(),meshes=[];const key=(x,y,z)=>`${x},${y},${z}`;
 function addBlock(x,y,z,type,save=true){const k=key(x,y,z);if(blocks.has(k))return;if(save&&typeof placedBlocks!=='undefined'){placedBlocks.set(k,type);removedBlocks.delete(k)}const m=new THREE.Mesh(geo,mat[type]||mat.grass);m.position.set(x,y,z);m.userData={x,y,z,type};scene.add(m);blocks.set(k,m);meshes.push(m);return m}
 function removeBlock(m){if(!m)return;const k=key(m.userData.x,m.userData.y,m.userData.z);placedBlocks.delete(k);removedBlocks.add(k);removeBlockRaw(m)}
@@ -110,7 +128,7 @@ function surfaceType(biome,h){
  return 'grass';
 }
 // Huge procedurally streamed world: nearby chunks only, no fixed map border.
-const CHUNK=16, VIEW=1;
+const CHUNK=16, VIEW=1, DEEP=-22;
 const loadedChunks=new Map(), removedBlocks=new Set(), placedBlocks=new Map();
 let generating=false;
 function chunkId(cx,cz){return cx+','+cz}
@@ -126,8 +144,17 @@ function loadChunk(cx,cz){
  const created=[];generating=created;
  for(let x=cx*CHUNK;x<(cx+1)*CHUNK;x++)for(let z=cz*CHUNK;z<(cz+1)*CHUNK;z++){
   const biome=biomeAt(x,z),h=heightAt(x,z);
-  // Surface + one sub-layer, instead of a solid mountain, to limit iPad GPU load.
-  for(let y=h-1;y<=h;y++)generatedBlock(x,y,z,y===h?surfaceType(biome,h):(biome==='desert'?'sand':'stone'));
+  // Surface and accessible deeper underground shafts/caverns.
+  // Generate exposed cave surfaces and sparse deep layers, not every hidden cube.
+  for(let y=DEEP;y<=h;y++){
+   const cave=Math.sin(x*.43+y*.62)*Math.cos(z*.39-y*.21)+Math.sin((x+z+y)*.28);
+   if(y<h-2 && cave>1.05)continue;
+   if(y<h-2 && y%3!==0 && cave<.35)continue;
+   let type=y===h?surfaceType(biome,h):(y>=h-2?(biome==='desert'?'sand':'dirt'):'stone');
+   const ore=((Math.imul(x,92821)^Math.imul(z,68917)^Math.imul(y,19391))>>>0)%131;
+   if(y<h-3){if(ore<4)type='coal';else if(ore<7)type='iron';else if(ore<9)type='copper';else if(y<-10&&ore===10)type='gold';else if(y<-14&&ore===11)type='gem';else if(y<-12&&ore===12)type='crystal';else if(ore===13)type='clay';}
+   generatedBlock(x,y,z,type);
+  }
   const hash=((Math.imul(x,73856093)^Math.imul(z,19349663))>>>0);
   const away=Math.hypot(x,z)>6;
   // Region-specific vegetation, resources and sparse rocky outcrops.
@@ -182,15 +209,15 @@ function removeBlockRaw(m){
  const i=meshes.indexOf(m);if(i>=0)meshes.splice(i,1);
 }
 const player={x:0,y:heightAt(0,0)+2.15,z:0,vx:0,vy:0,vz:0,yaw:0,pitch:-.1,hp:100,food:100,ground:false};
-for(let dx=-1;dx<=1;dx++)for(let dz=-1;dz<=1;dz++)loadChunk(dx,dz);
+loadChunk(0,0);
 camera.position.set(player.x,player.y,player.z);
-let started=false,selected='grass',day=0,inventory={grass:0,dirt:0,stone:0,wood:0,berry:3},slotNames=['grass','dirt','stone','wood','berry'];
-const labels={grass:'草方塊',dirt:'泥土',stone:'石頭',wood:'木材',berry:'莓果'},icons={grass:'🟩',dirt:'🟫',stone:'🪨',wood:'🪵',berry:'🍓'};
-const hotbar=document.querySelector('#hotbar');
+let started=false,selected='grass',day=0,inventory={grass:0,dirt:0,stone:0,wood:0,berry:3,coal:0,iron:0,copper:0,gold:0,gem:0,clay:0,crystal:0,sand:0,snow:0,ice:0},slotNames=['grass','dirt','stone','wood','berry','coal','iron','copper','gold','gem','clay','crystal'];
+const labels={grass:'草方塊',dirt:'泥土',stone:'石頭',wood:'木材',berry:'莓果',coal:'煤',iron:'鐵礦',copper:'銅礦',gold:'金礦',gem:'寶石',clay:'黏土',crystal:'水晶'},icons={grass:'🟩',dirt:'🟫',stone:'🪨',wood:'🪵',berry:'🍓',coal:'⚫',iron:'🔩',copper:'🟠',gold:'🟡',gem:'💎',clay:'🧱',crystal:'🔮'};
+const hotbar=document.querySelector('#hotbar');hotbar.style.maxWidth='94vw';hotbar.style.overflowX='auto';
 function drawHotbar(){hotbar.innerHTML='';slotNames.forEach((name,i)=>{const b=document.createElement('button');b.className='slot'+(selected===name?' active':'');b.innerHTML=`<strong>${icons[name]}</strong><span>${labels[name]} ${inventory[name]||0}</span>`;b.onclick=()=>{selected=name;drawHotbar()};hotbar.appendChild(b)})}drawHotbar();
 const raycaster=new THREE.Raycaster();function targetBlock(){raycaster.setFromCamera(new THREE.Vector2(0,0),camera);return raycaster.intersectObjects(meshes,false).find(h=>h.distance<5)}
 function toast(s){const el=document.querySelector('#message');el.textContent=s;el.style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>el.style.opacity=0,1700)}
-function mine(){const hit=targetBlock();if(!hit){toast('面前沒有可採集的方塊');return}const m=hit.object,t=m.userData.type;if(m.userData.y<=-1){toast('這裡太深了');return}removeBlock(m);const got=t==='leaf'?'berry':t==='grass'?'grass':t==='dirt'?'dirt':t==='wood'?'wood':t==='berry'?'berry':t==='snow'||t==='drygrass'||t==='swamp'?'grass':'stone';inventory[got]=(inventory[got]||0)+1;drawHotbar();toast(`取得：${labels[got]}`)}
+function mine(){const hit=targetBlock();if(!hit){toast('面前沒有可採集的方塊');return}const m=hit.object,t=m.userData.type;if(m.userData.y<=DEEP){toast('這裡太深了');return}removeBlock(m);const got=t==='leaf'?'berry':t==='drygrass'||t==='swamp'?'grass':inventory[t]!==undefined?t:'stone';inventory[got]=(inventory[got]||0)+1;drawHotbar();toast(`取得：${labels[got]}`)}
 function place(){const hit=targetBlock();if(!hit){toast('瞄準一個方塊旁邊再放置');return}if((inventory[selected]||0)<=0){toast(`${labels[selected]} 不足`);return}const n=hit.face.normal.clone().transformDirection(hit.object.matrixWorld);const p=hit.object.position.clone().add(n);if(Math.abs(p.x-player.x)<.8&&Math.abs(p.z-player.z)<.8&&p.y>player.y-1.8&&p.y<player.y+.5){toast('不能放在自己身上');return}addBlock(Math.round(p.x),Math.round(p.y),Math.round(p.z),selected);inventory[selected]--;drawHotbar();toast(`放置：${labels[selected]}`)}
 function eat(){if(inventory.berry>0){inventory.berry--;player.food=Math.min(100,player.food+28);drawHotbar();toast('吃了莓果，飢餓值恢復')}else toast('沒有莓果，去探索尋找吧')}
 // Stylized, fictional energy tool and simple wilderness creatures
@@ -208,7 +235,7 @@ for(let i=0;i<16;i++){
 }
 function shoot(){
  if(!started)return;
- if(!hasBlaster){toast('先在合成選單製作能量發射器');return}
+ if(!hasBlaster){toast('先在工作台合成荒野脈衝步槍');return}
  if(performance.now()-lastShot<350)return;lastShot=performance.now();
  const aim=new THREE.Raycaster();aim.setFromCamera(new THREE.Vector2(0,0),camera);
  const hit=aim.intersectObjects(creatures,false).find(h=>h.distance<14);
@@ -223,8 +250,8 @@ document.querySelector('#craft').onclick=()=>{craftPanel.style.display='block'};
 document.querySelector('#closecraft').onclick=()=>{craftPanel.style.display='none'};
 document.querySelector('#makeblaster').onclick=()=>{
  if(hasBlaster){toast('已經擁有能量發射器');return}
- if(inventory.wood<2||inventory.stone<2){toast('需要木材 ×2 和石頭 ×2');return}
- inventory.wood-=2;inventory.stone-=2;hasBlaster=true;drawHotbar();craftPanel.style.display='none';toast('合成成功：能量發射器！');
+ if(inventory.wood<2||inventory.iron<3||inventory.copper<2){toast('需要木材 ×2、鐵礦 ×3、銅礦 ×2');return}
+ inventory.wood-=2;inventory.iron-=3;inventory.copper-=2;hasBlaster=true;drawHotbar();craftPanel.style.display='none';toast('合成成功：荒野脈衝步槍！');
 };
 document.querySelector('#makeheal').onclick=()=>{
  if(inventory.wood<1||inventory.berry<1){toast('需要木材 ×1 和莓果 ×1');return}
@@ -245,6 +272,7 @@ function solidAt(x,y,z){const bx=Math.round(x),by=Math.round(y),bz=Math.round(z)
 let last=performance.now(),elapsed=0,chunkFrame=0;
 function animate(now){requestAnimationFrame(animate);const dt=Math.min(.04,(now-last)/1000);last=now;elapsed+=dt;
  if(started){
+  if((chunkFrame++%10)===0)refreshChunks();
   const forward=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0)-joyY;
   const side=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+joyX;
   const len=Math.hypot(forward,side)||1;const speed=4.1;
@@ -254,7 +282,7 @@ function animate(now){requestAnimationFrame(animate);const dt=Math.min(.04,(now-
   if(!solidAt(player.x,player.y-.8,player.z+dz))player.z+=dz;
   player.vy-=18*dt;let ny=player.y+player.vy*dt;
   if(player.vy<=0&&solidAt(player.x,ny-1.65,player.z)){player.y=Math.round(ny-1.65)+2.15;player.vy=0;player.ground=true}else{player.y=ny;player.ground=false}
-  if(player.y<-8){player.x=0;player.z=0;player.y=heightAt(0,0)+2.15;player.vy=0;player.hp-=10;toast('掉進深處，已回到起點')}
+  if(player.y<DEEP-7){player.x=0;player.z=0;player.y=heightAt(0,0)+2.15;player.vy=0;player.hp-=10;toast('掉進深處，已回到起點')}
   for(const mob of creatures){
    const dist=Math.hypot(player.x-mob.position.x,player.z-mob.position.z);
    if(dist<11&&dist>1.4){const step=dt*.55;mob.position.x+=(player.x-mob.position.x)/dist*step;mob.position.z+=(player.z-mob.position.z)/dist*step;}
