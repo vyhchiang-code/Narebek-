@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Narebek — Deep Wildlands v7 · 64px HD</title>
+<title>Narebek — Block Wildlife v9 · HD</title>
 <style>
 :root{--bg:#08151a;--panel:rgba(8,20,25,.82);--line:#45636a;--mint:#a5f3c5;--text:#effaf5}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -38,7 +38,7 @@ button:active{background:#245448}
 <body>
 <div id="game"></div>
 <div id="top">
- <div class="brand"><b>NAREBEK</b><small>WILDLANDS · DEEP WORLD v7 HD</small></div>
+ <div class="brand"><b>NAREBEK</b><small>WILDLANDS · BLOCK WILDLIFE v9 HD</small></div>
  <div class="status">❤ 生命 <span id="hptext">100</span><div class="meter"><i id="hpbar"></i></div>🍎 飢餓 <span id="foodtext">100</span><div class="meter"><i id="foodbar"></i></div><span id="clock">白天</span></div>
 </div>
 <div id="hint">左側移動 · 右側拖曳轉視角 · 點方塊採集</div>
@@ -50,17 +50,15 @@ button:active{background:#245448}
   <button id="eat">🍎 吃莓果</button><button id="jump">↑ 跳躍</button><button id="craft">🛠 合成</button><button id="shoot">✦ 發射</button>
  </div>
 </div>
+<button id="viewmode" style="position:fixed;right:12px;top:84px;z-index:3;min-height:36px;padding:5px 9px">🧍 方塊人視角</button>
 <div id="hotbar"></div>
-<div id="craftpanel" style="display:none;position:fixed;z-index:6;top:50%;left:50%;transform:translate(-50%,-50%);width:min(340px,90vw);padding:18px;background:#10272cf5;border:1px solid #a5f3c5;border-radius:18px">
-<h3 style="margin:0 0 8px">🛠 工作台 · 合成</h3>
-<p style="font-size:12px">木材 ×2 + 鐵礦 ×3 + 銅礦 ×2 → 荒野脈衝步槍</p>
-<button id="makeblaster">合成荒野脈衝步槍</button>
-<p style="font-size:12px">木材 ×1 + 莓果 ×1 → 急救包（恢復生命）</p>
-<button id="makeheal">合成急救包</button>
+<div id="craftpanel" style="display:none;position:fixed;z-index:6;top:50%;left:50%;transform:translate(-50%,-50%);width:min(400px,92vw);max-height:74vh;overflow-y:auto;padding:16px;background:#10272cf5;border:1px solid #a5f3c5;border-radius:18px">
+<h3 style="margin:0 0 8px">🛠 荒野工作台</h3><div id="recipes"></div>
 <button id="closecraft" style="display:block;margin-top:12px;width:100%">關閉</button></div>
+<div id="heldWeapon" aria-hidden="true" style="display:none;position:fixed;right:12%;bottom:3%;width:240px;height:135px;pointer-events:none;z-index:2;transform:rotate(-8deg);filter:drop-shadow(4px 9px 6px #0009)"><svg viewBox="0 0 300 170" width="100%" height="100%"><path d="M55 67 L185 67 L208 78 L261 78 L261 90 L207 90 L188 104 L100 104 L87 89 L55 89 Z" fill="#354247" stroke="#121d21" stroke-width="5"/><path d="M113 104 L146 104 L137 156 L111 156 Z" fill="#253035" stroke="#0e181c" stroke-width="5"/><path d="M67 89 L44 131 L26 126 L48 83 Z" fill="#28343a" stroke="#10191d" stroke-width="4"/><path d="M183 70 L183 49 L203 49 L203 69" fill="none" stroke="#19262a" stroke-width="7"/><path d="M261 82 L290 82" stroke="#17252a" stroke-width="9"/><path d="M97 73 L157 73" stroke="#6b8587" stroke-width="3"/><circle cx="189" cy="88" r="5" fill="#80d7cb"/></svg></div>
 <div id="start"><div class="card">
-<h1>NAREBEK</h1><div style="color:#a5f3c5;font-size:12px;letter-spacing:2px">WILDLANDS · DEEP WORLD v7 HD</div>
-<p>探索持續延伸的原創荒野：森林、沙漠、雪山、草原、濕地與深層礦洞。收集木材、石頭和莓果，搭建自己的小世界。新版加入 64×64 像素材質、礦石、合成式虛構脈衝步槍與荒野怪物。</p>
+<h1>NAREBEK</h1><div style="color:#a5f3c5;font-size:12px;letter-spacing:2px">WILDLANDS · BLOCK WILDLIFE v9 HD</div>
+<p>探索持續延伸的原創荒野：森林、沙漠、雪山、草原、濕地與深層礦洞。收集木材、石頭和莓果，搭建自己的小世界。新版加入自然地景、全方塊石岩怪物、方塊鹿兔野豬及方塊玩家、可見的手持虛構脈衝步槍，以及更多工作台配方。</p>
 <p><b>操作</b><br>iPad：左下搖桿移動，拖曳右側畫面轉視角；按「採集」取得面前方塊，按「放置」放置選中的方塊。電腦：WASD 移動、滑鼠轉視角、空白鍵跳躍、左鍵採集。</p>
 <button id="startbtn" type="button">進入荒野</button>
 </div></div>
@@ -113,7 +111,7 @@ function biomeAt(x,z){
 }
 function heightAt(x,z){
  const biome=biomeAt(x,z);
- const rolling=Math.sin(x*.065)*2.1+Math.cos(z*.071)*2.3+Math.sin((x+z)*.036)*1.7;
+ const rolling=Math.sin(x*.037)*3.1+Math.cos(z*.041)*2.8+Math.sin((x+z)*.021)*2.5+Math.sin(x*.11+z*.08)*.5;
  const rugged=Math.abs(Math.sin(x*.035)*Math.cos(z*.039))*13+Math.sin(x*.14+z*.11)*2;
  if(biome==='snow')return Math.floor(5+rolling+rugged);
  if(biome==='desert')return Math.floor(2+Math.sin(x*.04+z*.03)*3+rolling*.45);
@@ -176,7 +174,7 @@ function loadChunk(cx,cz){
  }
 
  generating=false;
- loadedChunks.set(id,created);
+ loadedChunks.set(id,created);addNature(cx,cz);
  // Restore placed blocks in this chunk.
  for(const [k,type] of placedBlocks){
   const [x,y,z]=k.split(',').map(Number);
@@ -185,13 +183,26 @@ function loadChunk(cx,cz){
   }
  }
 }
+// Natural ground details are small decorations, not thousands of extra blocks.
+const natureDecor=[];
+const flowerGeo=new THREE.ConeGeometry(.13,.42,5),flowerMats=[0xf1e1a2,0xe6a5a8,0xb7c9ee].map(c=>new THREE.MeshLambertMaterial({color:c}));
+function addNature(cx,cz){
+ const group=new THREE.Group();group.userData.natureChunk=chunkId(cx,cz);
+ for(let i=0;i<22;i++){
+  const x=cx*CHUNK+((i*11+cx*7+cz*3)%16),z=cz*CHUNK+((i*7+cz*11+cx*5)%16),b=biomeAt(x,z);
+  if(b==='desert'||b==='snow')continue;
+  const h=heightAt(x,z),f=new THREE.Mesh(flowerGeo,flowerMats[(i+Math.abs(cx)+Math.abs(cz))%3]);
+  f.position.set(x,h+.72,z);group.add(f);
+ }
+ scene.add(group);natureDecor.push(group);
+}
 function unloadChunk(id){
  const arr=loadedChunks.get(id);
  if(!arr)return;
  for(const m of arr){
   if(blocks.get(key(m.userData.x,m.userData.y,m.userData.z))===m)removeBlockRaw(m);
  }
- loadedChunks.delete(id);
+ loadedChunks.delete(id);for(let i=natureDecor.length-1;i>=0;i--)if(natureDecor[i].userData.natureChunk===id){scene.remove(natureDecor[i]);natureDecor.splice(i,1)}
 }
 function refreshChunks(){
  const cx=Math.floor(player.x/CHUNK),cz=Math.floor(player.z/CHUNK);
@@ -217,46 +228,87 @@ const hotbar=document.querySelector('#hotbar');hotbar.style.maxWidth='94vw';hotb
 function drawHotbar(){hotbar.innerHTML='';slotNames.forEach((name,i)=>{const b=document.createElement('button');b.className='slot'+(selected===name?' active':'');b.innerHTML=`<strong>${icons[name]}</strong><span>${labels[name]} ${inventory[name]||0}</span>`;b.onclick=()=>{selected=name;drawHotbar()};hotbar.appendChild(b)})}drawHotbar();
 const raycaster=new THREE.Raycaster();function targetBlock(){raycaster.setFromCamera(new THREE.Vector2(0,0),camera);return raycaster.intersectObjects(meshes,false).find(h=>h.distance<5)}
 function toast(s){const el=document.querySelector('#message');el.textContent=s;el.style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>el.style.opacity=0,1700)}
-function mine(){const hit=targetBlock();if(!hit){toast('面前沒有可採集的方塊');return}const m=hit.object,t=m.userData.type;if(m.userData.y<=DEEP){toast('這裡太深了');return}removeBlock(m);const got=t==='leaf'?'berry':t==='drygrass'||t==='swamp'?'grass':inventory[t]!==undefined?t:'stone';inventory[got]=(inventory[got]||0)+1;drawHotbar();toast(`取得：${labels[got]}`)}
+function mine(){const hit=targetBlock();if(!hit){toast('面前沒有可採集的方塊');return}const m=hit.object,t=m.userData.type;if(m.userData.y<=DEEP){toast('這裡太深了');return}removeBlock(m);const got=t==='leaf'?'berry':t==='drygrass'||t==='swamp'?'grass':inventory[t]!==undefined?t:'stone';inventory[got]=(inventory[got]||0)+(hasPickaxe&&['stone','coal','iron','copper','gold','gem','crystal'].includes(got)?2:1);drawHotbar();toast(`取得：${labels[got]}`)}
 function place(){const hit=targetBlock();if(!hit){toast('瞄準一個方塊旁邊再放置');return}if((inventory[selected]||0)<=0){toast(`${labels[selected]} 不足`);return}const n=hit.face.normal.clone().transformDirection(hit.object.matrixWorld);const p=hit.object.position.clone().add(n);if(Math.abs(p.x-player.x)<.8&&Math.abs(p.z-player.z)<.8&&p.y>player.y-1.8&&p.y<player.y+.5){toast('不能放在自己身上');return}addBlock(Math.round(p.x),Math.round(p.y),Math.round(p.z),selected);inventory[selected]--;drawHotbar();toast(`放置：${labels[selected]}`)}
 function eat(){if(inventory.berry>0){inventory.berry--;player.food=Math.min(100,player.food+28);drawHotbar();toast('吃了莓果，飢餓值恢復')}else toast('沒有莓果，去探索尋找吧')}
-// Stylized, fictional energy tool and simple wilderness creatures
-let hasBlaster=false, lastShot=0;
-const creatures=[], creatureBody=new THREE.BoxGeometry(.85,.8,.85);
-const creatureMat=new THREE.MeshLambertMaterial({color:0x8b679e});
-for(let i=0;i<16;i++){
- const angle=i*Math.PI*2/16, dist=11+(i%5)*5;
- const x=Math.round(Math.cos(angle)*dist),z=Math.round(Math.sin(angle)*dist);
- const body=new THREE.Mesh(creatureBody,creatureMat.clone());
- body.position.set(x,Math.max(0,heightAt(x,z))+1.05,z);
- body.userData.hp=3;scene.add(body);creatures.push(body);
- const eyes=new THREE.Mesh(new THREE.BoxGeometry(.48,.13,.07),new THREE.MeshBasicMaterial({color:0xe6faff}));
- eyes.position.set(0,.12,-.43);body.add(eyes);
+// Stylized fictional pulse tool; stone guardians and peaceful wildlife.
+let hasBlaster=false,lastShot=0,hasPickaxe=false,hasBoots=false,hasLantern=false;
+const creatures=[],animals=[];
+function boxPart(parent,w,h,d,color,x,y,z){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color}));m.position.set(x,y,z);parent.add(m);return m}
+function stoneGuardian(x,z){
+ const g=new THREE.Group();g.position.set(x,heightAt(x,z)+1.4,z);
+ boxPart(g,.98,1.1,.7,0x79888b,0,0,0);boxPart(g,.83,.7,.75,0x9ca6a1,0,.9,0);
+ boxPart(g,.36,.85,.42,0x637578,-.7,-.1,0);boxPart(g,.36,.85,.42,0x637578,.7,-.1,0);
+ boxPart(g,.34,.65,.38,0x53696b,-.3,-.82,0);boxPart(g,.34,.65,.38,0x53696b,.3,-.82,0);
+ boxPart(g,.16,.13,.09,0x8bf4d2,-.2,1,-.41);boxPart(g,.16,.13,.09,0x8bf4d2,.2,1,-.41);
+ g.userData.hp=4;scene.add(g);creatures.push(g);
 }
+function makeAnimal(type,x,z){
+ const g=new THREE.Group();g.position.set(x,heightAt(x,z)+1,z);
+ const deer=type==='deer',boar=type==='boar',rabbit=type==='rabbit';
+ const c=deer?0x9a6d4c:boar?0x65554a:0xd2c6b4;
+ const scale=rabbit?.65:1;g.scale.setScalar(scale);
+ boxPart(g,1.05,.65,.53,c,0,0,0);boxPart(g,.43,.43,.42,c,0,.25,-.6);
+ for(const sx of [-.34,.34])for(const sz of [-.2,.2])boxPart(g,.16,.48,.15,c,sx,-.48,sz);
+ if(deer){boxPart(g,.08,.65,.08,0xbda481,-.16,.76,-.72);boxPart(g,.08,.65,.08,0xbda481,.16,.76,-.72)}
+ if(rabbit){boxPart(g,.15,.57,.15,0xc8b5a2,-.16,.76,-.57);boxPart(g,.15,.57,.15,0xc8b5a2,.16,.76,-.57)}
+ boxPart(g,.12,.1,.05,0x1c2627,-.13,.32,-.83);boxPart(g,.12,.1,.05,0x1c2627,.13,.32,-.83);
+ g.userData={type,originX:x,originZ:z,phase:Math.random()*6};scene.add(g);animals.push(g);
+}
+for(let i=0;i<12;i++){const a=i*Math.PI*2/12,d=13+(i%4)*6;stoneGuardian(Math.round(Math.cos(a)*d),Math.round(Math.sin(a)*d))}
+for(let i=0;i<22;i++){const a=i*2.39996,d=9+(i%7)*5,x=Math.round(Math.cos(a)*d),z=Math.round(Math.sin(a)*d);makeAnimal(['deer','rabbit','boar'][i%3],x,z)}
+// All living models are built from cubes. The player is visible in third-person mode.
+const avatar=new THREE.Group();scene.add(avatar);
+const avatarBody=boxPart(avatar,.62,.82,.32,0x2d8067,0,0,0);
+boxPart(avatar,.48,.48,.43,0xe6b78e,0,.68,0);
+boxPart(avatar,.5,.16,.45,0x3e332e,0,.98,0);
+boxPart(avatar,.22,.76,.3,0x244d75,-.2,-.76,0);
+boxPart(avatar,.22,.76,.3,0x244d75,.2,-.76,0);
+boxPart(avatar,.2,.7,.3,0xe6b78e,-.49,-.08,0);
+boxPart(avatar,.2,.7,.3,0xe6b78e,.49,-.08,0);
+boxPart(avatar,.08,.07,.04,0x1b2525,-.13,.7,-.235);
+boxPart(avatar,.08,.07,.04,0x1b2525,.13,.7,-.235);
+let thirdPerson=false;
+document.querySelector('#viewmode').onclick=()=>{thirdPerson=!thirdPerson;document.querySelector('#viewmode').textContent=thirdPerson?'👁 第一人稱':'🧍 方塊人視角';toast(thirdPerson?'第三人稱：看見方塊人':'第一人稱：探索模式')};
+// Cubic muzzle, ears, and tails emphasize the block-built wildlife silhouettes.
+for(const animal of animals){
+ const t=animal.userData.type;
+ const c=t==='deer'?0x9a6d4c:t==='boar'?0x65554a:0xd2c6b4;
+ boxPart(animal,.3,.23,.25,c,0,.18,-.89);
+ if(t==='boar'){boxPart(animal,.3,.2,.09,0x9c8070,0,.13,-1.04);boxPart(animal,.14,.18,.13,c,-.24,.53,-.59);boxPart(animal,.14,.18,.13,c,.24,.53,-.59)}
+ if(t==='deer'){boxPart(animal,.22,.12,.12,c,0,.02,.38);boxPart(animal,.24,.12,.13,c,-.32,.51,-.58);boxPart(animal,.24,.12,.13,c,.32,.51,-.58)}
+ if(t==='rabbit'){boxPart(animal,.28,.27,.26,0xe4d8c9,0,.02,.39)}
+}
+// Weapon model appears in view only after crafting.
+function showHeldWeapon(){document.querySelector('#heldWeapon').style.display=hasBlaster?'block':'none';document.querySelector('#shoot').textContent=hasBlaster?'✦ 發射':'🔒 武器'}
+showHeldWeapon();
+const recipes=[
+ ['荒野脈衝步槍',{wood:2,iron:3,copper:2},()=>{hasBlaster=true;showHeldWeapon()},()=>hasBlaster],
+ ['石鎬',{wood:2,stone:3},()=>{hasPickaxe=true},()=>hasPickaxe],
+ ['探險靴',{wood:2,clay:2},()=>{hasBoots=true},()=>hasBoots],
+ ['探洞燈',{copper:2,crystal:1},()=>{hasLantern=true;const light=new THREE.PointLight(0xffe5a3,2.3,13);camera.add(light);scene.add(camera)},()=>hasLantern],
+ ['急救包',{wood:1,berry:1},()=>{player.hp=Math.min(100,player.hp+35)},()=>false],
+ ['野外餐包',{berry:3,wood:1},()=>{player.food=Math.min(100,player.food+55)},()=>false],
+ ['石材建築包 ×5',{stone:3,clay:2},()=>{inventory.stone+=5},()=>false],
+ ['水晶照明石 ×3',{crystal:1,stone:2},()=>{inventory.crystal+=3},()=>false],
+ ['木材補給 ×4',{wood:1,berry:2},()=>{inventory.wood+=4},()=>false]
+];
+const recipeBox=document.querySelector('#recipes');
+function drawRecipes(){recipeBox.innerHTML='';for(const [name,cost,effect,owned] of recipes){const b=document.createElement('button');b.style.cssText='width:100%;text-align:left;margin:4px 0;min-height:45px';b.textContent=(owned()?'✓ ':'')+name+' · '+Object.entries(cost).map(([k,v])=>(labels[k]||k)+'×'+v).join('、');b.onclick=()=>{if(owned()){toast('已經製作過了');return}const lack=Object.entries(cost).find(([k,v])=>(inventory[k]||0)<v);if(lack){toast('材料不足：'+(labels[lack[0]]||lack[0]));return}for(const [k,v] of Object.entries(cost))inventory[k]-=v;effect();drawHotbar();drawRecipes();toast('合成成功：'+name)};recipeBox.appendChild(b)}}
 function shoot(){
  if(!started)return;
  if(!hasBlaster){toast('先在工作台合成荒野脈衝步槍');return}
  if(performance.now()-lastShot<350)return;lastShot=performance.now();
  const aim=new THREE.Raycaster();aim.setFromCamera(new THREE.Vector2(0,0),camera);
- const hit=aim.intersectObjects(creatures,false).find(h=>h.distance<14);
- if(hit){const enemy=hit.object;enemy.userData.hp--;enemy.material.color.set(0xe6a6b3);
- setTimeout(()=>{if(enemy.parent)enemy.material.color.set(0x8b679e)},150);
- if(enemy.userData.hp<=0){scene.remove(enemy);creatures.splice(creatures.indexOf(enemy),1);inventory.stone++;drawHotbar();toast('擊退荒野怪物！獲得石頭');return}
+ const hit=aim.intersectObjects(creatures,true).find(h=>h.distance<16);
+ if(hit){const enemy=hit.object.parent;enemy.userData.hp--;
+ if(enemy.userData.hp<=0){scene.remove(enemy);creatures.splice(creatures.indexOf(enemy),1);inventory.stone++;drawHotbar();toast('擊退石岩守衛！獲得石頭');return}
  toast('能量命中！');
  }else toast('能量發射！');
 }
 const craftPanel=document.querySelector('#craftpanel');
-document.querySelector('#craft').onclick=()=>{craftPanel.style.display='block'};
+document.querySelector('#craft').onclick=()=>{drawRecipes();craftPanel.style.display='block'};
 document.querySelector('#closecraft').onclick=()=>{craftPanel.style.display='none'};
-document.querySelector('#makeblaster').onclick=()=>{
- if(hasBlaster){toast('已經擁有能量發射器');return}
- if(inventory.wood<2||inventory.iron<3||inventory.copper<2){toast('需要木材 ×2、鐵礦 ×3、銅礦 ×2');return}
- inventory.wood-=2;inventory.iron-=3;inventory.copper-=2;hasBlaster=true;drawHotbar();craftPanel.style.display='none';toast('合成成功：荒野脈衝步槍！');
-};
-document.querySelector('#makeheal').onclick=()=>{
- if(inventory.wood<1||inventory.berry<1){toast('需要木材 ×1 和莓果 ×1');return}
- inventory.wood--;inventory.berry--;player.hp=Math.min(100,player.hp+35);drawHotbar();craftPanel.style.display='none';toast('使用急救包，恢復生命');
-};
 document.querySelector('#shoot').onclick=shoot;
 document.querySelector('#mine').onclick=mine;document.querySelector('#place').onclick=place;document.querySelector('#eat').onclick=eat;
 let keys={};addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if(e.code==='Space'){e.preventDefault();jump()}if(e.key.toLowerCase()==='e')mine()});addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
@@ -275,7 +327,7 @@ function animate(now){requestAnimationFrame(animate);const dt=Math.min(.04,(now-
   if((chunkFrame++%10)===0)refreshChunks();
   const forward=(keys.w||keys.arrowup?1:0)-(keys.s||keys.arrowdown?1:0)-joyY;
   const side=(keys.d||keys.arrowright?1:0)-(keys.a||keys.arrowleft?1:0)+joyX;
-  const len=Math.hypot(forward,side)||1;const speed=4.1;
+  const len=Math.hypot(forward,side)||1;const speed=hasBoots?5.0:4.1;
   const dx=(-Math.sin(player.yaw)*forward+Math.cos(player.yaw)*side)/len*speed*dt;
   const dz=(-Math.cos(player.yaw)*forward-Math.sin(player.yaw)*side)/len*speed*dt;
   if(!solidAt(player.x+dx,player.y-.8,player.z))player.x+=dx;
@@ -283,17 +335,23 @@ function animate(now){requestAnimationFrame(animate);const dt=Math.min(.04,(now-
   player.vy-=18*dt;let ny=player.y+player.vy*dt;
   if(player.vy<=0&&solidAt(player.x,ny-1.65,player.z)){player.y=Math.round(ny-1.65)+2.15;player.vy=0;player.ground=true}else{player.y=ny;player.ground=false}
   if(player.y<DEEP-7){player.x=0;player.z=0;player.y=heightAt(0,0)+2.15;player.vy=0;player.hp-=10;toast('掉進深處，已回到起點')}
+  for(const animal of animals){const t=elapsed*.28+animal.userData.phase;animal.position.x=animal.userData.originX+Math.sin(t)*1.5;animal.position.z=animal.userData.originZ+Math.cos(t*.8)*1.5;animal.position.y=heightAt(Math.round(animal.position.x),Math.round(animal.position.z))+1;animal.rotation.y=-t*.12;}
   for(const mob of creatures){
    const dist=Math.hypot(player.x-mob.position.x,player.z-mob.position.z);
    if(dist<11&&dist>1.4){const step=dt*.55;mob.position.x+=(player.x-mob.position.x)/dist*step;mob.position.z+=(player.z-mob.position.z)/dist*step;}
-   mob.position.y=Math.max(0,heightAt(Math.round(mob.position.x),Math.round(mob.position.z)))+1.05+Math.sin(elapsed*3+mob.id)*.08;
+   mob.position.y=heightAt(Math.round(mob.position.x),Math.round(mob.position.z))+1.4+Math.sin(elapsed*3+mob.id)*.08;
    if(dist<1.5)player.hp=Math.max(0,player.hp-dt*5);
   }
   player.food=Math.max(0,player.food-dt*.22);if(player.food<=0)player.hp=Math.max(0,player.hp-dt*1.4);if(player.hp<=0){player.hp=100;player.food=65;player.x=0;player.z=0;player.y=heightAt(0,0)+2.15;toast('體力耗盡，回到營地')}
   document.querySelector('#hptext').textContent=Math.round(player.hp);document.querySelector('#foodtext').textContent=Math.round(player.food);document.querySelector('#hpbar').style.width=player.hp+'%';document.querySelector('#foodbar').style.width=player.food+'%';document.querySelector('#foodbar').style.background=player.food<25?'#ed9c62':'#77e4a2';
   const phase=(elapsed%180)/180;sun.position.set(Math.sin(phase*Math.PI*2)*25,Math.max(5,Math.cos(phase*Math.PI*2)*22),10);const night=phase>.68||phase<.08;scene.background.set(night?0x17253f:0x91cbe8);scene.fog.color.set(night?0x17253f:0x91cbe8);document.querySelector('#clock').textContent=night?'夜晚':'白天';
  }
- camera.position.set(player.x,player.y,player.z);camera.rotation.order='YXZ';camera.rotation.y=player.yaw;camera.rotation.x=player.pitch;
+ avatar.visible=thirdPerson;
+ avatar.position.set(player.x,player.y-1.15,player.z);
+ avatar.rotation.y=player.yaw;
+ camera.position.set(player.x,player.y,player.z);
+ camera.rotation.order='YXZ';camera.rotation.y=player.yaw;camera.rotation.x=player.pitch;
+ if(thirdPerson){const backward=new THREE.Vector3(0,.95,4.1).applyEuler(camera.rotation);camera.position.add(backward)}
  renderer.render(scene,camera)
 }requestAnimationFrame(animate);
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
